@@ -22,8 +22,9 @@ async def async_post(url, payload, headers):
 class Tiamat:
     """TODO."""
 
-    def __init__(self, editwin):
+    def __init__(self, editwin, run_in_idle=True):
         self.editwin = editwin
+        self.run_in_idle = run_in_idle
         self.history = []
         self.input = tk.StringVar()
 
@@ -41,7 +42,12 @@ class Tiamat:
 
     def init_widgets(self):
         """TODO."""
-        panel = ttk.Frame(self.editwin.top)
+        if self.run_in_idle:
+            parent = self.editwin.top
+        else:
+            parent = self.editwin
+
+        panel = ttk.Frame(parent)
         panel.pack(side="left", fill="y", expand=False, padx=(0, 0), pady=(0, 0))
 
         self.feed_box = ttk.Frame(panel, borderwidth=2, relief="sunken")
@@ -70,6 +76,9 @@ class Tiamat:
             text=""
         )
         submit_btn.pack(side="right", padx=0, pady=1)
+
+        if not self.run_in_idle:
+            self.editwin.mainloop()
 
     def handle_user_input(self, event=None):
         """TODO."""
@@ -119,3 +128,6 @@ class Tiamat:
 
         self.msgfeed.config(state="disabled")
         self.msgfeed.see(tk.END)
+
+if __name__ == "__main__":
+    Tiamat(tk.Tk(), run_in_idle=False)
