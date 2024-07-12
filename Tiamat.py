@@ -3,6 +3,8 @@
 import asyncio
 import threading
 import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 import aiohttp
 
 
@@ -23,6 +25,7 @@ class Tiamat:
     def __init__(self, editwin):
         self.editwin = editwin
         self.history = []
+        self.input = tk.StringVar()
 
         self.async_loop = asyncio.new_event_loop()
 
@@ -38,48 +41,40 @@ class Tiamat:
 
     def init_widgets(self):
         """TODO."""
-        panel = tk.Frame(self.editwin.top, bg="white")
+        panel = ttk.Frame(self.editwin.top)
         panel.pack(side="left", fill="y", expand=False, padx=(0, 0), pady=(0, 0))
 
-        self.feed_box = tk.Frame(panel, borderwidth=2, relief="sunken")
+        self.feed_box = ttk.Frame(panel, borderwidth=2, relief="sunken")
         self.feed_box.pack(side="bottom", fill="x", padx=5, pady=5)
 
-        self.msgfeed = tk.Text(
+        self.msgfeed = ttk.ScrolledText(
             panel,
             state="disabled",
             height=20,
             width=50,
             borderwidth=2,
-            relief="sunken",
+            relief="sunken"
         )
         self.msgfeed.pack(side="top", fill="both", expand=True, padx=5, pady=5)
 
-        self.input_box = tk.Text(
-            self.feed_box, height=2, width=50, borderwidth=0, highlightthickness=0
+        self.input_box = ttk.Entry(
+            self.feed_box,
+            textvariable=self.input
         )
         self.input_box.pack(side="left", fill="both", expand=True, padx=0, pady=1)
         self.input_box.bind("<Return>", self.handle_user_input)
 
-        submit_btn = tk.Button(
+        submit_btn = ttk.Button(
             self.feed_box,
             command=self.handle_user_input,
-            text="",
-            background="white",
-            height=2,
-            width=1,
-            foreground="gray",
-            highlightcolor="white",
-            highlightbackground="white",
-            cursor="hand2",
-            relief=tk.FLAT,
-            font=("Arial", 30, "bold"),
+            text=""
         )
         submit_btn.pack(side="right", padx=0, pady=1)
 
     def handle_user_input(self, event=None):
         """TODO."""
-        user_input = self.input_box.get("1.0", tk.END).strip()
-        self.input_box.delete("1.0", tk.END)
+        user_input = self.input.get()
+        self.input_box.delete(0, ttk.END)
 
         if user_input:
             coroutine = self.query_assistant(user_input)
